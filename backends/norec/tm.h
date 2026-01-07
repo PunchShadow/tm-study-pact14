@@ -65,8 +65,34 @@
 #  define TM_SHARED_WRITE_P(var, val)   STM_WRITE_P((var), val)
 #  define TM_SHARED_WRITE_D(var, val)   STM_WRITE_D((var), val)
 
+#  define TM_SHARED_READ_F(var)         ({ \
+                                            float* ptr = &(var); \
+                                            uintptr_t addr = (uintptr_t)ptr; \
+                                            uintptr_t word_addr = addr & ~(sizeof(intptr_t)-1); \
+                                            intptr_t word_val = STM_READ(*(intptr_t*)word_addr); \
+                                            union { intptr_t i; float f[2]; } cvt; \
+                                            cvt.i = word_val; \
+                                            (addr == word_addr) ? cvt.f[0] : cvt.f[1]; \
+                                        })
+
+#  define TM_SHARED_WRITE_F(var, val)   do { \
+                                            float* ptr = &(var); \
+                                            uintptr_t addr = (uintptr_t)ptr; \
+                                            uintptr_t word_addr = addr & ~(sizeof(intptr_t)-1); \
+                                            intptr_t old_word = STM_READ(*(intptr_t*)word_addr); \
+                                            union { intptr_t i; float f[2]; } cvt; \
+                                            cvt.i = old_word; \
+                                            if (addr == word_addr) { \
+                                                cvt.f[0] = (val); \
+                                            } else { \
+                                                cvt.f[1] = (val); \
+                                            } \
+                                            STM_WRITE(*(intptr_t*)word_addr, cvt.i); \
+                                        } while (0)
+
 #  define TM_LOCAL_WRITE(var, val)      STM_LOCAL_WRITE(var, val)
 #  define TM_LOCAL_WRITE_P(var, val)    STM_LOCAL_WRITE_P(var, val)
 #  define TM_LOCAL_WRITE_D(var, val)    STM_LOCAL_WRITE_D(var, val)
+#  define TM_LOCAL_WRITE_F(var, val)    STM_LOCAL_WRITE(var, val)
 
 #endif /* TM_H */

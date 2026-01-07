@@ -51,14 +51,17 @@
 
 #define TM_SHARED_READ(var)           wlpdstm_read_word_desc(tx, (Word *)(&var))
 #define TM_SHARED_READ_P(var)         (void *)wlpdstm_read_word_desc(tx, (Word *)(&var))
+#define TM_SHARED_READ_F(var)         wlpdstm_read_float_desc(tx, (&var))
 #define TM_SHARED_READ_D(var)         wlpdstm_read_double_desc(tx, (&var))
 
 #define TM_SHARED_WRITE(var, val)     wlpdstm_write_word_desc(tx, (Word *)(&var), (Word)(val))
 #define TM_SHARED_WRITE_P(var, val)   wlpdstm_write_word_desc(tx, (Word *)(&var), (Word)(val))
+#define TM_SHARED_WRITE_F(var, val)   wlpdstm_write_float_desc(tx, (&var), (val))
 #define TM_SHARED_WRITE_D(var, val)   wlpdstm_write_double_desc(tx, (&var), (val))
 
 #define TM_LOCAL_WRITE(var, val)      ({var = val; var;})
 #define TM_LOCAL_WRITE_P(var, val)    ({var = val; var;})
+#define TM_LOCAL_WRITE_F(var, val)    ({var = val; var;})
 #define TM_LOCAL_WRITE_D(var, val)    ({var = val; var;})
 
 #define TM_CALLABLE                     /* nothing */
